@@ -6,11 +6,21 @@ import 'vuetify/dist/vuetify.min.css'
 import { store } from './store'
 import firebase from './firebase'
 
-Vue.use(Vuetify)
+/* eslint-disable */
+Vue.use(Vuetify, {
+  theme: {
+    primary: "#f44336",
+    secondary: "#e57373",
+    accent: "#9c27b0",
+    error: "#f44336",
+    warning: "#ffeb3b",
+    info: "#2196f3",
+    success: "#4caf50"
+  }
+})
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
 const unsubscribe = firebase.auth()
 .onAuthStateChanged((firebaseUser) => {
   new Vue({
