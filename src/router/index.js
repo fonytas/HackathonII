@@ -1,37 +1,52 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import firebase from 'firebase'
-
-const routerOptions = [
-  { path: '/', component: 'Landing' },
-  { path: '/signin', component: 'Signin' },
-  { path: '/signup', component: 'Signup' },
-  { path: '/home', component: 'Home', meta: { requiresAuth: true } },
-  { path: '*', component: 'NotFound' }
-]
-
-const routes = routerOptions.map(route => {
-  return {
-    ...route,
-    component: () => import(`@/components/${route.component}.vue`)
-  }
-})
+import Home from '@/components/Home'
+import Landing from '@/components/Landing'
+import NotFound from '@/components/NotFound'
+import Signup from '@/components/Signup'
+import Signin from '@/components/Signin'
 
 Vue.use(Router)
 
-const router = new Router({
-  mode: 'history',
-  routes
-})
-
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  const isAuthenticated = firebase.auth().currentUser
-  if (requiresAuth && !isAuthenticated) {
-    next('/signin')
-  } else {
+const AuthGuard = (to, from, next) => {
+  if (firebase.auth().currentUser) {
     next()
+  } else {
+    next('/signin')
   }
-})
+}
 
-export default router
+// export default router
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'Landing',
+      component: Landing,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/signin',
+      name: 'Signin',
+      component: Signin
+    },
+    {
+      path: '/signup',
+      name: 'Signup',
+      component: Signup
+    },
+    {
+      path: '/home',
+      name: 'Home',
+      component: Home,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '*',
+      name: 'NotFound',
+      component: NotFound
+    }
+  ],
+  mode: 'history'
+})
